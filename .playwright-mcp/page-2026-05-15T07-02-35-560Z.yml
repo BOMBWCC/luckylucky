@@ -1,0 +1,197 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: 按住鼠标在银色区域拖动，刮开涂层。
+      - button "重置" [ref=e5] [cursor=pointer]
+    - article "好运来刮刮乐彩票" [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - generic [ref=e9]: 中国福利彩票
+          - generic [ref=e10]: 面值 30 元
+        - heading "好运来" [level=1] [ref=e11]
+      - generic [ref=e12]:
+        - complementary [ref=e13]:
+          - generic [ref=e14]: 本票共有 10 局玩法，刮开银色覆盖膜即可查看结果。
+          - generic [ref=e15]:
+            - text: 最高
+            - text: 奖金
+            - text: 80 万元
+          - generic [ref=e16]: 刮出相同图案或号码命中，即获得对应奖金。
+        - region "图案刮奖区" [ref=e17]:
+          - generic [ref=e18]:
+            - generic [ref=e19]:
+              - generic [ref=e20]: 第1局
+              - generic [ref=e21]:
+                - generic [ref=e22]: ☯
+                - generic [ref=e23]: ✷
+                - generic [ref=e24]: ✥
+              - generic [ref=e25]:
+                - text: ¥40
+                - generic [ref=e26]: "40"
+            - generic [ref=e27]:
+              - generic [ref=e28]: 第2局
+              - generic [ref=e29]:
+                - generic [ref=e30]: ✿
+                - generic [ref=e31]: ✥
+                - generic [ref=e32]: ❁
+              - generic [ref=e33]:
+                - text: ¥100
+                - generic [ref=e34]: "100"
+            - generic [ref=e35]:
+              - generic [ref=e36]: 第3局
+              - generic [ref=e37]:
+                - generic [ref=e38]: ✧
+                - generic [ref=e39]: ✪
+                - generic [ref=e40]: ✷
+              - generic [ref=e41]:
+                - text: ¥500
+                - generic [ref=e42]: "500"
+            - generic [ref=e43]:
+              - generic [ref=e44]: 第4局
+              - generic [ref=e45]:
+                - generic [ref=e46]: ✺
+                - generic [ref=e47]: ☯
+                - generic [ref=e48]: ✦
+              - generic [ref=e49]:
+                - text: ¥80
+                - generic [ref=e50]: "80"
+            - generic [ref=e51]:
+              - generic [ref=e52]: 第5局
+              - generic [ref=e53]:
+                - generic [ref=e54]: ✦
+                - generic [ref=e55]: ✿
+                - generic [ref=e56]: ✺
+              - generic [ref=e57]:
+                - text: ¥1000
+                - generic [ref=e58]: "1000"
+            - generic [ref=e59]:
+              - generic [ref=e60]: 第6局
+              - generic [ref=e61]:
+                - generic [ref=e62]: ✹
+                - generic [ref=e63]: ✦
+                - generic [ref=e64]: ✧
+              - generic [ref=e65]:
+                - text: ¥40
+                - generic [ref=e66]: "40"
+            - generic [ref=e67]:
+              - generic [ref=e68]: 第7局
+              - generic [ref=e69]:
+                - generic [ref=e70]: ✿
+                - generic [ref=e71]: ✿
+                - generic [ref=e72]: ✿
+              - generic [ref=e73]:
+                - text: ¥40
+                - generic [ref=e74]: "40"
+            - generic [ref=e75]:
+              - generic [ref=e76]: 第8局
+              - generic [ref=e77]:
+                - generic [ref=e78]: ✿
+                - generic [ref=e79]: ✥
+                - generic [ref=e80]: ❀
+              - generic [ref=e81]:
+                - text: ¥1000
+                - generic [ref=e82]: "1000"
+            - generic [ref=e83]:
+              - generic [ref=e84]: 第9局
+              - generic [ref=e85]:
+                - generic [ref=e86]: ✺
+                - generic [ref=e87]: ✥
+                - generic [ref=e88]: ☯
+              - generic [ref=e89]:
+                - text: ¥500
+                - generic [ref=e90]: "500"
+            - generic [ref=e91]:
+              - generic [ref=e92]: 第10局
+              - generic [ref=e93]:
+                - generic [ref=e94]: ✪
+                - generic [ref=e95]: ✦
+                - generic [ref=e96]: ☘
+              - generic [ref=e97]:
+                - text: ¥40
+                - generic [ref=e98]: "40"
+      - region "财富字样" [ref=e100]:
+        - generic [ref=e101]: 吉
+      - region "号码刮奖区" [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]: 奖金 ▼
+          - generic [ref=e105]: 我的号码 ▼
+          - generic [ref=e106]: 中奖号码 ▲
+          - strong [ref=e107]: ¥100,000
+          - strong [ref=e108]: "04"
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - text: "09"
+            - generic [ref=e111]: "9"
+          - generic [ref=e112]:
+            - text: "20"
+            - generic [ref=e113]: "20"
+          - generic [ref=e114]:
+            - text: "22"
+            - generic [ref=e115]: "22"
+          - generic [ref=e116]:
+            - text: "13"
+            - generic [ref=e117]: "13"
+          - generic [ref=e118]:
+            - text: "29"
+            - generic [ref=e119]: "29"
+          - generic [ref=e120]:
+            - text: "01"
+            - generic [ref=e121]: "1"
+          - generic [ref=e122]:
+            - text: "25"
+            - generic [ref=e123]: "25"
+          - generic [ref=e124]:
+            - text: "26"
+            - generic [ref=e125]: "26"
+          - generic [ref=e126]:
+            - text: "08"
+            - generic [ref=e127]: "8"
+          - generic [ref=e128]:
+            - text: "41"
+            - generic [ref=e129]: "41"
+          - generic [ref=e130]:
+            - text: "11"
+            - generic [ref=e131]: "11"
+          - generic [ref=e132]:
+            - text: "04"
+            - generic [ref=e133]: "4"
+          - generic [ref=e134]:
+            - text: "47"
+            - generic [ref=e135]: "47"
+          - generic [ref=e136]:
+            - text: "17"
+            - generic [ref=e137]: "17"
+          - generic [ref=e138]:
+            - text: "36"
+            - generic [ref=e139]: "36"
+          - generic [ref=e140]:
+            - text: "28"
+            - generic [ref=e141]: "28"
+          - generic [ref=e142]:
+            - text: "34"
+            - generic [ref=e143]: "34"
+          - generic [ref=e144]:
+            - text: "14"
+            - generic [ref=e145]: "14"
+          - generic [ref=e146]:
+            - text: "37"
+            - generic [ref=e147]: "37"
+          - generic [ref=e148]:
+            - text: "44"
+            - generic [ref=e149]: "44"
+          - generic [ref=e150]:
+            - text: "38"
+            - generic [ref=e151]: "38"
+          - generic [ref=e152]:
+            - text: "30"
+            - generic [ref=e153]: "30"
+          - generic [ref=e154]:
+            - text: "06"
+            - generic [ref=e155]: "6"
+          - generic [ref=e156]:
+            - text: "16"
+            - generic [ref=e157]: "16"
+      - generic [ref=e158]:
+        - generic [ref=e159]: 保安区 刮开无效
+        - generic [ref=e161]: J1300-61193-1179746-787-7
+  - status: 新票已生成。
