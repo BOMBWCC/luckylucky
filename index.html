@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>刮刮乐 Battle</title>
   <link rel="icon" href="data:,">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.5/peerjs.min.js"></script>
   <style>
     :root {
       --red: #e71912;
@@ -160,8 +161,8 @@
 
     .signal-box {
       width: 100%;
-      min-height: 62px;
-      resize: vertical;
+      min-height: 42px;
+      resize: none;
       border: 1px solid rgba(255, 213, 79, .36);
       border-radius: 6px;
       padding: 7px;
@@ -686,16 +687,14 @@
     </section>
 
     <details class="webrtc-panel" id="webrtcPanel">
-      <summary>WebRTC 邀请链接</summary>
+      <summary>PeerJS 房间码</summary>
       <div class="webrtc-body">
-        <div class="webrtc-status" id="webrtcStatus">纯前端模式：邀请链接打开后，朋友还需要发回回应码。</div>
+        <div class="webrtc-status" id="webrtcStatus">创建 16 位房间码，朋友输入后加入。页面仍可放在 GitHub Pages。</div>
         <div class="webrtc-actions">
-          <button class="ghost-button" id="createInviteButton" type="button">创建邀请</button>
-          <button class="ghost-button" id="createAnswerButton" type="button" disabled>生成回应</button>
+          <button class="ghost-button" id="createInviteButton" type="button">创建房间</button>
+          <button class="ghost-button" id="createAnswerButton" type="button">加入房间</button>
         </div>
-        <textarea class="signal-box" id="inviteBox" readonly placeholder="邀请链接会出现在这里"></textarea>
-        <textarea class="signal-box" id="answerBox" placeholder="朋友的回应码粘贴到这里"></textarea>
-        <button class="primary-button" id="acceptAnswerButton" type="button">连接回应码</button>
+        <textarea class="signal-box" id="inviteBox" placeholder="房间码，例如 A1B2C3D4E5F6G7H8"></textarea>
       </div>
     </details>
 
@@ -780,9 +779,7 @@
     const webrtcStatus = document.querySelector("#webrtcStatus");
     const createInviteButton = document.querySelector("#createInviteButton");
     const createAnswerButton = document.querySelector("#createAnswerButton");
-    const acceptAnswerButton = document.querySelector("#acceptAnswerButton");
     const inviteBox = document.querySelector("#inviteBox");
-    const answerBox = document.querySelector("#answerBox");
     const scratchPanel = document.querySelector("#gameScratch");
     const canvas = document.querySelector("#gameCanvas");
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -821,8 +818,9 @@
     let playerTimes = [];
     let rivalTimes = [];
     let gameStartedAt = 0;
+    let peer = null;
     let peerConnection = null;
-    let dataChannel = null;
+    let dataConnection = null;
     let peerRole = "local";
     let suppressNetworkStart = false;
 
@@ -842,80 +840,55 @@
       return `¥${value.toLocaleString("zh-CN")}`;
     }
 
-    function toSignal(data) {
-      const json = JSON.stringify(data);
-      const bytes = new TextEncoder().encode(json);
-      let binary = "";
-      bytes.forEach(byte => {
-        binary += String.fromCharCode(byte);
-      });
-      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    }
-
-    function fromSignal(signal) {
-      const normalized = signal.trim().replace(/^#/, "").replace(/^webrtc=/, "");
-      const padded = normalized.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(normalized.length / 4) * 4, "=");
-      const binary = atob(padded);
-      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
-      return JSON.parse(new TextDecoder().decode(bytes));
-    }
-
-    function waitForIceGathering(pc) {
-      if (pc.iceGatheringState === "complete") {
-        return Promise.resolve();
-      }
-
-      return new Promise(resolve => {
-        const timeout = setTimeout(resolve, 3000);
-        pc.addEventListener("icegatheringstatechange", () => {
-          if (pc.iceGatheringState === "complete") {
-            clearTimeout(timeout);
-            resolve();
-          }
-        });
-      });
-    }
-
     function setWebrtcStatus(message) {
       webrtcStatus.textContent = message;
     }
 
-    function setupPeerConnection() {
-      if (peerConnection) {
-        peerConnection.close();
-      }
-
-      peerConnection = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    function makeRoomCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "";
+      crypto.getRandomValues(new Uint8Array(16)).forEach(value => {
+        code += chars[value % chars.length];
       });
-
-      peerConnection.addEventListener("connectionstatechange", () => {
-        setWebrtcStatus(`WebRTC 状态：${peerConnection.connectionState}`);
-      });
-
-      peerConnection.addEventListener("datachannel", event => {
-        wireDataChannel(event.channel);
-      });
-
-      return peerConnection;
+      return code;
     }
 
-    function wireDataChannel(channel) {
-      dataChannel = channel;
-      dataChannel.addEventListener("open", () => {
-        setWebrtcStatus("WebRTC 已连接。房主点开始会同步到朋友。");
+    function roomToPeerId(code) {
+      return `lunky-${code.trim().toUpperCase().replace(/[^A-Z0-9]/g, "")}`;
+    }
+
+    function resetPeer() {
+      if (dataConnection) {
+        dataConnection.close();
+      }
+      if (peer) {
+        peer.destroy();
+      }
+      peer = null;
+      peerConnection = null;
+      dataConnection = null;
+    }
+
+    function wireDataConnection(connection) {
+      dataConnection = connection;
+      peerConnection = connection;
+      dataConnection.on("open", () => {
+        setWebrtcStatus("PeerJS 已连接。房主点开始会同步到朋友。");
       });
-      dataChannel.addEventListener("close", () => {
-        setWebrtcStatus("WebRTC 已断开。");
+      dataConnection.on("close", () => {
+        setWebrtcStatus("PeerJS 连接已断开。");
       });
-      dataChannel.addEventListener("message", event => {
-        handlePeerMessage(JSON.parse(event.data));
+      dataConnection.on("error", error => {
+        setWebrtcStatus(`PeerJS 连接错误：${error.message}`);
+      });
+      dataConnection.on("data", message => {
+        handlePeerMessage(message);
       });
     }
 
     function sendPeerMessage(message) {
-      if (dataChannel && dataChannel.readyState === "open") {
-        dataChannel.send(JSON.stringify(message));
+      if (dataConnection && dataConnection.open) {
+        dataConnection.send(message);
       }
     }
 
@@ -928,57 +901,41 @@
       }
     }
 
-    async function createInvite() {
+    function createInvite() {
       peerRole = "host";
-      const pc = setupPeerConnection();
-      wireDataChannel(pc.createDataChannel("battle"));
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      await waitForIceGathering(pc);
-      const signal = toSignal({ type: "offer", sdp: pc.localDescription });
-      const inviteUrl = `${location.origin}${location.pathname}#webrtc=${signal}`;
-      inviteBox.value = inviteUrl;
-      answerBox.value = "";
-      setWebrtcStatus("邀请链接已生成。发给朋友，朋友打开后生成回应码发回你。");
+      resetPeer();
+      const code = makeRoomCode();
+      inviteBox.value = code;
+      peer = new Peer(roomToPeerId(code));
+      peer.on("open", () => {
+        setWebrtcStatus(`房间已创建：${code}。朋友输入这个 16 位房间码加入。`);
+      });
+      peer.on("connection", connection => {
+        wireDataConnection(connection);
+      });
+      peer.on("error", error => {
+        setWebrtcStatus(`PeerJS 错误：${error.message}`);
+      });
     }
 
-    async function createAnswer() {
+    function createAnswer() {
       peerRole = "guest";
-      const signal = location.hash.replace(/^#webrtc=/, "");
-      if (!signal) {
-        setWebrtcStatus("当前链接里没有邀请信息。");
+      const code = inviteBox.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      if (code.length !== 16) {
+        setWebrtcStatus("请输入 16 位房间码。");
         return;
       }
 
-      const payload = fromSignal(signal);
-      if (payload.type !== "offer") {
-        setWebrtcStatus("邀请信息格式不对。");
-        return;
-      }
-
-      const pc = setupPeerConnection();
-      await pc.setRemoteDescription(payload.sdp);
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      await waitForIceGathering(pc);
-      answerBox.value = toSignal({ type: "answer", sdp: pc.localDescription });
-      setWebrtcStatus("回应码已生成。把下面这段发回房主。");
-    }
-
-    async function acceptAnswer() {
-      if (!peerConnection || peerRole !== "host") {
-        setWebrtcStatus("请先创建邀请，再粘贴朋友的回应码。");
-        return;
-      }
-
-      const payload = fromSignal(answerBox.value);
-      if (payload.type !== "answer") {
-        setWebrtcStatus("回应码格式不对。");
-        return;
-      }
-
-      await peerConnection.setRemoteDescription(payload.sdp);
-      setWebrtcStatus("回应码已接收，正在建立 WebRTC 连接。");
+      resetPeer();
+      inviteBox.value = code;
+      peer = new Peer();
+      peer.on("open", () => {
+        setWebrtcStatus("正在加入房间...");
+        wireDataConnection(peer.connect(roomToPeerId(code), { reliable: true }));
+      });
+      peer.on("error", error => {
+        setWebrtcStatus(`PeerJS 错误：${error.message}`);
+      });
     }
 
     function weightedPrize() {
@@ -1385,26 +1342,24 @@
     settleButton.addEventListener("click", runSettlement);
     againButton.addEventListener("click", startGame);
     createInviteButton.addEventListener("click", () => {
-      createInvite().catch(error => setWebrtcStatus(`创建邀请失败：${error.message}`));
+      try {
+        createInvite();
+      } catch (error) {
+        setWebrtcStatus(`创建房间失败：${error.message}`);
+      }
     });
     createAnswerButton.addEventListener("click", () => {
-      createAnswer().catch(error => setWebrtcStatus(`生成回应失败：${error.message}`));
-    });
-    acceptAnswerButton.addEventListener("click", () => {
-      acceptAnswer().catch(error => setWebrtcStatus(`连接回应失败：${error.message}`));
+      try {
+        createAnswer();
+      } catch (error) {
+        setWebrtcStatus(`加入房间失败：${error.message}`);
+      }
     });
     window.addEventListener("resize", () => {
       if (ticket) {
         resizeCanvas();
       }
     });
-
-    if (location.hash.startsWith("#webrtc=")) {
-      webrtcPanel.open = true;
-      createAnswerButton.disabled = false;
-      inviteBox.value = location.href;
-      setWebrtcStatus("检测到邀请链接。点“生成回应”，再把回应码发回房主。");
-    }
 
     ticket = createTicket();
     renderTicket();
